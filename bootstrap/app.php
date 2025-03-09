@@ -11,7 +11,10 @@ return Application::configure(basePath: dirname(__DIR__))
         api: __DIR__ . '/../routes/api.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware) {})
+    ->withMiddleware(function (Middleware $middleware) {
+        // Tambahkan \App\Http\Middleware\NotFound::class, ke dalam middleware untuk menangani route yang tidak ditemukan
+        $middleware->append(\App\Http\Middleware\NotFound::class);
+    })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->reportable(function (Throwable $e) {
             // Log atau laporkan exception
@@ -23,7 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
             $errorCode = $e->getCode() ?: $statusCode;
 
             return response()->json([
-                'message' => 'Terjadi kesalahan pada server.',
+                'is_error' => true,
                 'error' => $e->getMessage(),
                 'status_code' => $statusCode,
                 'error_code' => $errorCode,
